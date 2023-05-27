@@ -1,23 +1,30 @@
 import React from 'react';
-import {Flex, IconButton} from "@chakra-ui/react";
-import {FaComment, FaHeart, FaRegComment, FaRegHeart, FaTrash} from "react-icons/fa";
+import {Box, Flex, IconButton, Spacer} from "@chakra-ui/react";
+import {FaComment, FaEdit, FaHeart, FaRegComment, FaRegHeart, FaTrash} from "react-icons/fa";
 import {useAuth} from "../../hooks/auth";
-import {useDeletePost, useToggleLike} from "../../hooks/posts";
+import {useDeletePost, useEditPost, useToggleLike} from "../../hooks/posts";
 import {Link} from "react-router-dom";
 import {PROTECTED} from "../../lib/routes";
 import {useComments} from "../../hooks/comments";
+import PopoverForm from "./popoverForm";
+
 
 const Actions = ({post}) => {
-    const {likes, id, uid} = post;
+    const {likes, id, uid, text} = post;
     const {user, isLoading: userLoading} = useAuth();
     const isLiked = likes.includes(user?.id);
     const {toggleLike, isLoading: likeLoading} = useToggleLike({id, isLiked, uid: user?.id});
     const {deletePost, isLoading: deleteLoading} = useDeletePost(id);
     const {comments, isLoading: commentsLoading} = useComments(id);
+    const {editPost, isLoading: editingLoading} = useEditPost({id});
+
+    const handleSave = (text)=>{
+        editPost(text);
+    }
 
     return (
         <Flex p="2">
-            <Flex alignItems="center">
+            <Box>
                 <IconButton
                     onClick={toggleLike}
                     isLoading={likeLoading || userLoading}
@@ -28,12 +35,10 @@ const Actions = ({post}) => {
                     isRound
                 />
                 {likes.length}
-            </Flex>
-            <Flex alignItems="center">
                 <IconButton
                     as={Link}
                     to={`${PROTECTED}/comments/${id}`}
-                    // isLoading={likeLoading || userLoading}
+                    isLoading={commentsLoading || userLoading}
                     size="md"
                     colorScheme="teal"
                     variant="ghost"
@@ -41,18 +46,27 @@ const Actions = ({post}) => {
                     isRound
                 />
                 {comments?.length}
-            </Flex>
+            </Box>
+
+            <Spacer/>
             {!userLoading && user.id === uid && (
-                <IconButton
-                ml="auto"
-                onClick={deletePost}
-                isLoading={deleteLoading || userLoading}
-                size="md"
-                colorScheme="red"
-                variant="ghost"
-                icon={<FaTrash/>}
-                isRound
-                />
+                <Box>
+                    <PopoverForm
+                        onSave={handleSave}
+                        editingLoading={editingLoading}
+                        userLoading={userLoading}
+                        textPost={text}/>
+                    <IconButton
+                        ml="auto"
+                        onClick={deletePost}
+                        isLoading={deleteLoading || userLoading}
+                        size="md"
+                        colorScheme="red"
+                        variant="ghost"
+                        icon={<FaTrash/>}
+                        isRound
+                    />
+                </Box>
             )}
 
         </Flex>

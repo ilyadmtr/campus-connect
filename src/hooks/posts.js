@@ -72,6 +72,25 @@ export function useToggleLike({id, isLiked, uid}){
 
     return {toggleLike, isLoading};
 }
+
+
+
+export function useEditPost({id}){
+    const [isLoading, setLoading] = useState(false);
+
+    async function editPost(text){
+        setLoading(true);
+        const docRef = doc(db, "posts", id);
+        await updateDoc(docRef, {
+            text: text,
+            date: Date.now()
+        });
+        setLoading(false);
+    }
+
+    return {editPost, isLoading};
+}
+
 export function useDeletePost(id) {
     const [isLoading, setLoading] = useState(false);
     const toast = useToast();

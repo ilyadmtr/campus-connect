@@ -50,9 +50,6 @@ export default function Profile() {
                             Posts: {posts?.length}
                         </Text>
                         <Text color="gray.700" fontSize={["sm", "lg"]}>
-                            Likes: todo!
-                        </Text>
-                        <Text color="gray.700" fontSize={["sm", "lg"]}>
                             Joined: {format(user.date, "MMMM YYY")}
                         </Text>
                     </HStack>
